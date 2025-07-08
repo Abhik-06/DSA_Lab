@@ -1,14 +1,19 @@
-#include <stdio.h>
+	#include <stdio.h>
 
 int main()
 {
-	int n;
-	int rot;
-	int dir;
-	int temp;
+	int n=0;
+	int rot=0;
+	int dir=0;
+	int temp=0;
 	
 	printf("Enter the number of elements in the array : ");
 	scanf("%d",&n);
+	if(n==0)
+	{
+		printf("There is nothing to sort");
+		return 0;
+	}
 	
 	int arr[n];
 	
@@ -28,29 +33,29 @@ int main()
 	{
 		for(int i = 0;i<rot;i++)
 		{
-			temp = arr[i];
-			for(int i = 1;i<n;i++)
+			temp = arr[0];
+			for(int j = 1;j<n;j++)
 			{
-				arr[i-1] = arr[i];
+				arr[j-1] = arr[j];
 			}
 			arr[n-1] = temp;
 		}
 	}
 	
-	else
+	else if(dir==1)
 	{
 		for(int i = 0;i<rot;i++)
 		{
 			temp = arr[n-1];
-			for(int i = 0;i<n-1;i++)
+			for(int j = n-1;j>0;j--)
 			{
-				arr[i-1] = arr[i];
+				arr[j] = arr[j-1];
 			}
 			arr[1] = temp;
 		}
 	}
 	
-	printf("The array, rotated %d times is : ");
+	printf("The array, rotated %d times is : ",rot);
 	for(int i = 0;i<n;i++)
 	{
 		printf("%d ",arr[i]);
@@ -58,9 +63,3 @@ int main()
 	
 	return 0;
 }	
-		
-		
-		
-		
-		
-		
