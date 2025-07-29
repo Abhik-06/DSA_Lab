@@ -26,7 +26,7 @@ int main(){
         }
 
         if(choice==2){
-            if(check(check,top)==-1){
+            if(check(stack,top)==-1){
                 printf("Stack Underflow ! ");
                 choice = Choice();
             }
@@ -38,7 +38,7 @@ int main(){
         }
 
         if(choice==3){
-            if(check(check,top)==-1){
+            if(check(stack,top)==-1){
                 printf("Stack Underflow ! ");
                 choice = Choice();
             }
@@ -50,7 +50,7 @@ int main(){
         }
 
         if(choice==4){
-            if(check(check,top)==-1){
+            if(check(stack,top)==-1){
                 printf("Stack Underflow !");
                 choice = Choice();
             }
