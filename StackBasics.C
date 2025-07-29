@@ -1,8 +1,11 @@
 #include <stdio.h>
 
 void push(int stack[], int *top);
-void pop(int stack[], int *top);
+int pop(int stack[], int *top);
 void peak(int stack[], int *top);
+int MaxElement(int stack[], int *top);
+int check(int stack[], int top);
+int Choice();
 
 int main() {
     int temp;
@@ -72,11 +75,41 @@ void push(int stack[], int *top) {
     (*top)++;
 }
 
-void pop(int stack[], int *top) {
+int pop(int stack[], int *top) {
     (*top)--;
     printf("The element removed is %d\n", stack[*top]);
+    return *top;
 }
 
 void peak(int stack[], int *top) {
     printf("Top element is: %d\n", stack[*top - 1]);
+}
+
+int MaxElement(int stack[], int *top){
+    int temp;
+    while(*top>=0){
+        if(pop(stack,top)>temp){
+            temp = stack[*top];
+        }
+    }
+    return temp;
+}
+
+int check(int stack[], int top){
+    if(top>=(sizeof(stack)/sizeof(stack[0]))){
+        return 0;
+    }
+    else if(top==0){
+        return -1;
+    }
+    else{
+        return 1;
+    }
+}
+
+int Choice(){
+    int temp;
+    printf("Do you wish to rerun the program ?\n1 for yes\n0 for no");
+
+    return temp;
 }
