@@ -1,137 +1,115 @@
 #include <stdio.h>
 
-int temp;
-int max = 5;
+#define MAX 5
 
-int Check();
-void Enque();
-int Deque();
-void IsEmpty();
-void IsFull();
-void Peek();
-void Display(); //Optional
+void Enqueue(int queue[], int *front, int *rear);
+int Dequeue(int queue[], int *front, int *rear);
+int Check(int front, int rear);
+void Peek(int queue[], int front);
+void Display(int queue[], int front, int rear);
+int Choice();
 
-int main(){
-    int queue[5];
-    int front = -1;
-    int rear = -1;
-    int choice;
+int main() {
+    int queue[MAX];
+    int front = -1, rear = -1, choice = 1;
 
-    while(choice==1){
-        printf("Enter the function to perform\n1 for enque\n2 for deque\n3 for checking if queue is empty\n4 for checking if queue is full\n5 for peek\n6 for displaying all the elements of the queue from start to end\nChoice : ");
-        scanf("%d",choice);
+    while (choice == 1) {
+        int option;
+        printf("\nEnter the function to perform:\n");
+        printf("1 for Enqueue\n2 for Dequeue\n3 for checking if queue is empty\n");
+        printf("4 for checking if queue is full\n5 for Peek\n6 for Display\nChoice: ");
+        scanf("%d", &option);
 
-        switch (choice){
-        //Enque
-        case 1:
-            if(Check(queue,&front,&rear)==1){
-                print("Queue overflow !");
-                choice = Choice(queue,front,rear);
-            }
-            else{
-                Enque(queue,&front,&rear);
-                choice = Choice();
-            }
-            break;
-        //Deque
-        case 2:
-            if(Check(queue,front,rear)==-1){
-                pritnf("Stack underflow !");
-                choice = Choice(queue,front,rear);
-            }
-            else{
-                Deque(queue,front,rear);
-                choice = Choice();
-            }
-            break;
-        //If stack is empty
-        case 3:
-            if(Check(queue,front,rear)==-1){
-                printf("Stack is empty !");
-                choice = Choice();
-            }
-            else{
-                printf("Stack is not empty !");
-                choice = Choice();
-            }
-            break;
-        //If stack is full
-        case 4:
-            if(Check(queue,front,rear)==1){
-                printf("Stack is full !");
-                choice = Choice();
-            }
-            else{
-                printf("Stack is not full !");
-                choice = Choice();
-            }
-        //Peek
-        case 5:
-            if(Check(queue,front,rear)==-1){
-                printf("Stack Underflow ! ");
-                choice = Choice();
-            }
-            else{
-                Peek();
-                choice = Choice();
-            }
-            break;
-        //Display
-        case 6:
-            if(Check(queue,front,rear)==-1){
-                printf("Stack Underflow !");
-            }
-            else{
-                Display();
-                choice = Choice();
-            }
-            break;
-        default:
-            printf("Worng input, terminating !");
-            break;
+        switch (option) {
+            case 1: // Enqueue
+                if (rear == MAX - 1) {
+                    printf("Queue Overflow!\n");
+                } else {
+                    Enqueue(queue, &front, &rear);
+                }
+                break;
+
+            case 2: // Dequeue
+                if (front == -1 || front > rear) {
+                    printf("Queue Underflow!\n");
+                } else {
+                    Dequeue(queue, &front, &rear);
+                }
+                break;
+
+            case 3: // Is Empty
+                if (front == -1 || front > rear)
+                    printf("Queue is empty.\n");
+                else
+                    printf("Queue is not empty.\n");
+                break;
+
+            case 4: // Is Full
+                if (rear == MAX - 1)
+                    printf("Queue is full.\n");
+                else
+                    printf("Queue is not full.\n");
+                break;
+
+            case 5: // Peek
+                if (front == -1 || front > rear)
+                    printf("Queue is empty (Underflow).\n");
+                else
+                    Peek(queue, front);
+                break;
+
+            case 6: // Display
+                if (front == -1 || front > rear)
+                    printf("Queue is empty (Underflow).\n");
+                else
+                    Display(queue, front, rear);
+                break;
+
+            default:
+                printf("Wrong input. Terminating.\n");
         }
+
+        choice = Choice();
     }
 
     return 0;
 }
 
-int Check(int queue[],int *front, int *rear){
-    if(front>rear){
-        return 0;
-    }
-    else if(front==-1 && rear==-1){
-        return 0;
-    }
-    else if(fro)
-}
+void Enqueue(int queue[], int *front, int *rear) {
+    int temp;
+    printf("Enter the element you wish to enqueue: ");
+    scanf("%d", &temp);
 
-void Enque(int queue[],int *front,int *rear){
-    printf("Enter the element you wish to push into the array : ");
-    scanf("%d",temp);
-
-    if(front==-1 && rear==-1){
-        front = 0;
-        rear = 0;
-    }
-    else{
-        rear+=1;
-    }
-
+    if (*front == -1) *front = 0;
+    (*rear)++;
     queue[*rear] = temp;
 }
 
-void Deque(int queue[],int *front, int *rear){
-    temp = queue[front];
-
-    if(rear==front){
-        front = -1;
-        rear = -1;
+int Dequeue(int queue[], int *front, int *rear) {
+    int temp = queue[*front];
+    printf("The element removed is %d\n", temp);
+    (*front)++;
+    if (*front > *rear) {
+        *front = *rear = -1; // Reset the queue
     }
-    else{
-        front+=1;
-    }
-
-    printf("The element removed is %d",temp);
+    return temp;
 }
 
-void Peek(int queue[],int *front,int *)
+void Peek(int queue[], int front) {
+    printf("The front element is: %d\n", queue[front]);
+}
+
+void Display(int queue[], int front, int rear) {
+    printf("Queue elements are: ");
+    for (int i = front; i <= rear; i++) {
+        printf("%d ", queue[i]);
+    }
+    printf("\n");
+}
+
+int Choice() {
+    int temp;
+    printf("Do you wish to rerun the program?\n1 for yes\n0 for no\nChoice: ");
+    scanf("%d", &temp);
+    return temp;
+}

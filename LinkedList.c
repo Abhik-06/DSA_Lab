@@ -1,30 +1,31 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-void Choice(int *choice);
-int EnterData();
-void InsertAtFront(struct node** head);
-void InsertAtEnd(struct node* head);
-void InsertAtIndex(struct node* head);
-void DeleteAtFront(struct node** head);
-void DeleteAtEnd(struct node* head);
-void DeleteAtIndex(struct node* head);
-
 // The struct model
 struct node{
     int data;
     struct node *next;
 };
-
 // Declaring the head as the pointer of the first node
 struct node* head = NULL;
-int temp;
+
+void Choice(int *choice);
+int EnterData();
+int EnterIndex();
+void InsertAtFront(struct node** head);
+void InsertAtEnd(struct node** head);
+void InsertAtIndex(struct node* head);
+void DeleteAtFront(struct node** head);
+void DeleteAtEnd(struct node** head);
+void DeleteAtIndex(struct node* head);
+void DisplayList(struct node* head);
+
 
 int main(){
     int choice = 1;
     
     while(choice==1){
-        printf("Enter the function to perform \n1 for ADD node\n2 for REMOVE node\nChoice : ");
+        printf("Enter the function to perform \n1 for ADD node\n2 for REMOVE node\n3 for Display the list\nChoice : ");
         scanf("%d",&choice);
 
         switch (choice){
@@ -42,7 +43,7 @@ int main(){
                     Choice(&choice);
                     break;
                 case 3:
-                    InsertAtIndex(&head);
+                    InsertAtIndex(head);
                     Choice(&choice);
                     break;
                 default:
@@ -50,12 +51,11 @@ int main(){
                     Choice(&choice);
                     break;
             }
-            Choice(&choice);
             break;
 
         case 2:
             printf("Where do you wish to delete the node from \n1 for AT FRONT\n2 for AT END\n3 for AT INDEX\nChoice : ");
-            scanf("%d",&choice );
+            scanf("%d",&choice);
             
             switch (choice){
                 case 1:
@@ -67,7 +67,7 @@ int main(){
                     Choice(&choice);
                     break;
                 case 3:
-                    DeleteAtIndex(&head);
+                    DeleteAtIndex(head);
                     Choice(&choice);
                     break;
                 default:
@@ -75,6 +75,10 @@ int main(){
                     Choice(&choice);
                     break;
             }
+            break;
+
+        case 3:
+            DisplayList(head);
             Choice(&choice);
             break;
 
@@ -91,16 +95,21 @@ int main(){
 
 void Choice(int *choice){
     printf("Do you wish to rerun ?\n1 for yes\n0 fo rno\nChoice : ");
-    scanf("%d",&choice);
+    scanf("%d",choice);
 }
 
 int EnterData(){
+    int temp;
+
     printf("Enter the data you wish to enter : ");
     scanf("%d",&temp);
+
     return temp;
 }
 
 int EnterIndex(){
+    int temp;
+
     printf("Enter the index : ");
     scanf("%d",&temp);
 
@@ -112,37 +121,50 @@ void InsertAtFront(struct node** head){
     struct node *newnode = (struct node*)malloc(sizeof(struct node));
 
     newnode->data = data;
-    newnode->next = head;
+    newnode->next = (*head);
 
-    head = newnode;
+    *head = newnode;
 
     printf("Done !");
 }
 
-void InsertAtEnd(struct node* head){
+void InsertAtEnd(struct node** head){
+    if((*head)==NULL){
+        InsertAtFront(head);
+        return;
+    }
+
     int data = EnterData();
     struct node* newnode = (struct node*)malloc(sizeof(struct node));
+
+    struct node* temp = (*head);
     
     newnode->data = data;
     newnode->next = NULL;
 
-    while(head->next!=NULL){
-        head++;
+    while(temp->next!=NULL){
+        temp = temp->next;
     }
 
-    head->next = newnode;
+    temp->next = newnode;
 
     printf("Done !");
 }
 
 void InsertAtIndex(struct node* head){
+    int index = EnterIndex();
+    if(index==0){
+        InsertAtFront(&head);
+        return;
+    }
+
     int data = EnterData();
     struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    newnode->data = data;
 
-    int index = EnterIndex();
-
-    for(int i = 0;i<index{
-        if(head->data==NULL){
+   
+    for(int i = 0;i<index;i++){
+        if(head==NULL){
             printf("Out of bonds !");
             return;
         }
@@ -157,23 +179,42 @@ void InsertAtIndex(struct node* head){
 
 void DeleteAtFront(struct node** head){
     struct node* prevnode = *head;
+
+    if((*head)==NULL){
+        printf("EMPTY LIST\n");
+        return;
+    }
+
+    if((*head)->next==NULL){
+        free(prevnode);
+        printf("Done !\n");
+        return;
+    }
     *head = (*head)->next;
     free(prevnode);
 
     printf("Done !");
 }
 
-void DeleteAtEnd(struct node* head){
-    struct node* nextnode = head->next;
-
-    while(nextnode!=NULL){
-        nextnode = nextnode->next;
-        head = head->next;
+void DeleteAtEnd(struct node** head){
+    struct node* temp = *head;
+    if(*(head)==NULL){
+        printf("EMPTY LIST !");
+        return;
+    }
+    if((*head)->next==NULL){
+        free(temp);
+        printf("Done !\n");
+        return;
     }
 
-    free(head);
-    printf("Done !");
-    
+    while(temp->next->next!=NULL){
+        temp = temp->next;
+    }
+
+    free(temp->next);
+    temp->next = NULL;
+
 }
 
 void DeleteAtIndex(struct node* head){
@@ -192,4 +233,18 @@ void DeleteAtIndex(struct node* head){
     free(ToDelete);
 
     printf("Done !");
+}
+
+void DisplayList(struct node* head){
+    if(head==NULL){
+        printf("EMPTY LIST !");
+        return;
+    }
+    
+    while(head!=NULL){
+        printf("%d ",head->data);
+        head = head->next;
+    }
+
+    printf("\nDONE !\n");
 }
