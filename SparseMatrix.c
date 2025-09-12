@@ -1,155 +1,156 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct matrix {
+struct sparse {
     int row;
     int col;
     int value;
 };
 
 struct sparsematrix {
-    int numValues;
-    struct matrix elements[100];
+    int nvalues;
+    struct sparse unit[100];
 };
 
-// Function to enter a sparse matrix
-void EnterMatrix(struct sparsematrix *s) {
-    printf("Enter number of non-zero values: ");
-    scanf("%d", &s->numValues);
-
-    for (int i = 0; i < s->numValues; i++) {
-        printf("Enter row, col, value for element %d: ", i + 1);
-        scanf("%d %d %d", &s->elements[i].row, &s->elements[i].col, &s->elements[i].value);
+void ReadSparse(struct sparsematrix *sp, int *matrix, int rows, int cols) {
+    sp->nvalues = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            int val = *(matrix + i * cols + j);
+            if (val != 0) {
+                sp->unit[sp->nvalues].row = i;
+                sp->unit[sp->nvalues].col = j;
+                sp->unit[sp->nvalues].value = val;
+                sp->nvalues++;
+            }
+        }
     }
 }
 
-// Function to display sparse matrix in triplet form
-void DisplayMatrix(struct sparsematrix s) {
-    printf("Row Col Value\n");
-    for (int i = 0; i < s.numValues; i++) {
-        printf("%d   %d   %d\n", s.elements[i].row, s.elements[i].col, s.elements[i].value);
+void DisplaySparse(struct sparsematrix *sp) {
+    for (int i = 0; i < sp->nvalues; i++) {
+        printf("%d %d %d\n", sp->unit[i].row, sp->unit[i].col, sp->unit[i].value);
     }
+    printf("\n");
 }
 
-// Function to add two sparse matrices
-struct sparsematrix AddMatrix(struct sparsematrix a, struct sparsematrix b) {
+void AddSparse(struct sparsematrix *sp1, struct sparsematrix *sp2) {
     struct sparsematrix result;
-    result.numValues = 0;
-
+    result.nvalues = 0;
     int i = 0, j = 0;
-    while (i < a.numValues && j < b.numValues) {
-        if (a.elements[i].row == b.elements[j].row &&
-            a.elements[i].col == b.elements[j].col) {
-            result.elements[result.numValues].row = a.elements[i].row;
-            result.elements[result.numValues].col = a.elements[i].col;
-            result.elements[result.numValues].value = a.elements[i].value + b.elements[j].value;
-            result.numValues++;
+    while (i < sp1->nvalues && j < sp2->nvalues) {
+        if (sp1->unit[i].row < sp2->unit[j].row ||
+           (sp1->unit[i].row == sp2->unit[j].row && sp1->unit[i].col < sp2->unit[j].col)) {
+            result.unit[result.nvalues++] = sp1->unit[i++];
+        } else if (sp1->unit[i].row > sp2->unit[j].row ||
+                 (sp1->unit[i].row == sp2->unit[j].row && sp1->unit[i].col > sp2->unit[j].col)) {
+            result.unit[result.nvalues++] = sp2->unit[j++];
+        } else {
+            int sum = sp1->unit[i].value + sp2->unit[j].value;
+            if (sum != 0) {
+                result.unit[result.nvalues].row = sp1->unit[i].row;
+                result.unit[result.nvalues].col = sp1->unit[i].col;
+                result.unit[result.nvalues].value = sum;
+                result.nvalues++;
+            }
             i++;
             j++;
         }
-        else if (a.elements[i].row < b.elements[j].row ||
-                (a.elements[i].row == b.elements[j].row && a.elements[i].col < b.elements[j].col)) {
-            result.elements[result.numValues++] = a.elements[i++];
-        }
-        else {
-            result.elements[result.numValues++] = b.elements[j++];
-        }
     }
-
-    while (i < a.numValues) result.elements[result.numValues++] = a.elements[i++];
-    while (j < b.numValues) result.elements[result.numValues++] = b.elements[j++];
-
-    return result;
+    while (i < sp1->nvalues) {
+        result.unit[result.nvalues++] = sp1->unit[i++];
+    }
+    while (j < sp2->nvalues) {
+        result.unit[result.nvalues++] = sp2->unit[j++];
+    }
+    DisplaySparse(&result);
 }
 
-// Function to subtract two sparse matrices
-struct sparsematrix SubtractMatrix(struct sparsematrix a, struct sparsematrix b) {
+void TransposeSparse(struct sparsematrix *sp) {
     struct sparsematrix result;
-    result.numValues = 0;
-
-    int i = 0, j = 0;
-    while (i < a.numValues && j < b.numValues) {
-        if (a.elements[i].row == b.elements[j].row &&
-            a.elements[i].col == b.elements[j].col) {
-            result.elements[result.numValues].row = a.elements[i].row;
-            result.elements[result.numValues].col = a.elements[i].col;
-            result.elements[result.numValues].value = a.elements[i].value - b.elements[j].value;
-            result.numValues++;
-            i++;
-            j++;
-        }
-        else if (a.elements[i].row < b.elements[j].row ||
-                (a.elements[i].row == b.elements[j].row && a.elements[i].col < b.elements[j].col)) {
-            result.elements[result.numValues++] = a.elements[i++];
-        }
-        else {
-            result.elements[result.numValues] = b.elements[j];
-            result.elements[result.numValues].value = -b.elements[j].value; // subtract → negate b
-            result.numValues++;
-            j++;
+    result.nvalues = sp->nvalues;
+    for (int i = 0; i < sp->nvalues; i++) {
+        result.unit[i].row = sp->unit[i].col;
+        result.unit[i].col = sp->unit[i].row;
+        result.unit[i].value = sp->unit[i].value;
+    }
+    for (int i = 0; i < result.nvalues - 1; i++) {
+        for (int j = i + 1; j < result.nvalues; j++) {
+            if (result.unit[i].row > result.unit[j].row ||
+               (result.unit[i].row == result.unit[j].row && result.unit[i].col > result.unit[j].col)) {
+                struct sparse temp = result.unit[i];
+                result.unit[i] = result.unit[j];
+                result.unit[j] = temp;
+            }
         }
     }
-
-    while (i < a.numValues) result.elements[result.numValues++] = a.elements[i++];
-    while (j < b.numValues) {
-        result.elements[result.numValues] = b.elements[j];
-        result.elements[result.numValues].value = -b.elements[j].value;
-        result.numValues++;
-        j++;
-    }
-
-    return result;
+    DisplaySparse(&result);
 }
 
 int main() {
-    struct sparsematrix m1, m2, result;
-    int choice;
+    int rows1;
+    int cols1;
 
-    while (1) {
-        printf("\nMenu:\n");
-        printf("1. Enter Matrix 1\n");
-        printf("2. Enter Matrix 2\n");
-        printf("3. Display Matrix 1\n");
-        printf("4. Display Matrix 2\n");
-        printf("5. Add Matrices\n");
-        printf("6. Subtract Matrices (M1 - M2)\n");
-        printf("7. Exit\n");
-        printf("Choice: ");
-        scanf("%d", &choice);
+    printf("Enter the number of rows in the first matrix : ");
+    scanf("%d", &rows1);
+    printf("Enter the number of colomns in the matrix : ");
+    scanf("%d", &cols1);
 
-        switch (choice) {
-            case 1:
-                printf("Enter Matrix 1:\n");
-                EnterMatrix(&m1);
-                break;
-            case 2:
-                printf("Enter Matrix 2:\n");
-                EnterMatrix(&m2);
-                break;
-            case 3:
-                printf("Matrix 1:\n");
-                DisplayMatrix(m1);
-                break;
-            case 4:
-                printf("Matrix 2:\n");
-                DisplayMatrix(m2);
-                break;
-            case 5:
-                result = AddMatrix(m1, m2);
-                printf("Result of Addition:\n");
-                DisplayMatrix(result);
-                break;
-            case 6:
-                result = SubtractMatrix(m1, m2);
-                printf("Result of Subtraction (M1 - M2):\n");
-                DisplayMatrix(result);
-                break;
-            case 7:
-                exit(0);
-            default:
-                printf("Invalid choice!\n");
+    int *matrix1 = (int *)malloc((rows1 * cols1) * sizeof(int));
+
+    for (int i = 0; i < rows1; i++) {
+        for (int j = 0; j < cols1; j++) {
+            printf("Enter matrix1[%d][%d] : ", i, j);
+            scanf("%d", &matrix1[i * cols1 + j]);
         }
     }
 
+    int rows2;
+    int cols2;
+
+    printf("Enter the number of rows in the second matrix : ");
+    scanf("%d", &rows2);
+    printf("Enter the number of colomns in the matrix : ");
+    scanf("%d", &cols2);
+
+    if (rows1 != rows2 || cols1 != cols2) {
+        printf("Matrix addition not possible. Dimensions must match.\n");
+        return 1;
+    }
+
+    int *matrix2 = (int *)malloc((rows2 * cols2) * sizeof(int));
+
+    for (int i = 0; i < rows2; i++) {
+        for (int j = 0; j < cols2; j++) {
+            printf("Enter matrix2[%d][%d] : ", i, j);
+            scanf("%d", &matrix2[i * cols2 + j]);
+        }
+    }
+
+    struct sparsematrix sparse1;
+    struct sparsematrix sparse2;
+
+    ReadSparse(&sparse1, matrix1, rows1, cols1);
+    ReadSparse(&sparse2, matrix2, rows2, cols2);
+
+    printf("The first sparsematrix represented in the form of an array of structures is : ");
+    DisplaySparse(&sparse1);
+    printf("The second sparsematrix represented in the form of an array of structures is : ");
+    DisplaySparse(&sparse2);
+
+    printf("The sum of the two sparsematrices are : ");
+    AddSparse(&sparse1, &sparse2);
+
+    printf("The transpose of the first sparse matrix is : ");
+    TransposeSparse(&sparse1);
+    printf("The transpose of the second sparse matrix is : ");
+    TransposeSparse(&sparse2);
+
+    printf("Thank you for using my program ! :)\n");
+
+    free(matrix1);
+    free(matrix2);
+
+    printf("Thank you for usign my program ! :)");
     return 0;
 }
