@@ -6,6 +6,14 @@ struct node{
     struct node* left;
     struct node* right;
 };
+struct queue{
+    struct qnode* front;
+    struct qnode* rear;
+};
+struct qnode{
+    struct node* treenode;
+    struct qnode* next;
+}
 
 void Choice(int* choice);
 int EnterData();
@@ -13,6 +21,7 @@ struct node* InsertIntoTree(struct node* root,int data);
 
 int main(){
     struct node* root;
+    struct qnode* q;
     int* choice = 1;
 
     while(choice>0){
@@ -39,6 +48,13 @@ int main(){
 
     printf("Thank you for using my program :)");
     return 0;
+}
+
+struct qnode* CreateQnode(struct qnode* q){
+    q = malloc(sizeof(struct qnode));
+    q->next = NULL;
+
+    return q;
 }
 
 int Choice(int* choice){
@@ -125,4 +141,70 @@ struct node* DeleteFromTree(struct node* root,int data){
     }
 }
 
-void DisplayElements
+struct node* InOrder(struct node* root){
+    if(root!=NULL){
+        InOrder(root->left);
+        printf("%d ",root->data);
+        InOrder(root->right);
+    }
+}
+
+struct node* PreOrder(struct node* root){
+    if(root!=NULL){
+        printf("%d ",root->data);
+        PreOrder(root->left);
+        PreOrder(root->right);
+    }
+}
+
+struct node* PostOrder(struct node* root){
+    if(root!=NULL){
+        PreOrder(root->left);
+        Preorder(root->right);
+        PostOrder("%d ",root->data);
+    }
+}
+
+void LevelOrder(struct node* root,struct qnode* q){
+    if(root==NULL){
+        return;
+    }
+    struct qnode* q = CreateQnode(q);
+    Enque(q,root->data);
+
+    while(!isEmpty(q)){
+        struct node* current = deque(q);
+        printf("%d ",current->data);
+
+        if(current->left==NULL){
+            Enque(q,current->left);
+        }
+        if(current->right==NULL){
+            Enque(q,current->right);
+        }
+    }
+}
+
+void Enque(struct queue* q,struct node* node){
+    struct qnode* temp = (struct node*)malloc(sizeof(struct qnode));
+    temp->treenode = node;
+    temp->next = NULL;
+
+    if(q->rear==NULL){
+        q->front = q->rear = temp;
+        return;
+    }
+    q->rear->next = temp;
+    q->rear = temp;
+    return;
+}
+
+void Deque(struct queue* q,struct node* node){
+    if(q->front==NULL){
+        return;
+    }
+
+    struct qnode* temp = q->front;
+    struct node* treenode = temp->treenode;
+    
+}
