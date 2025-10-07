@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "StackBasics.C": "cpp"
+        "StackBasics.C": "cpp",
+        "stdio.h": "c"
     }
 }
