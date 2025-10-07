@@ -148,6 +148,23 @@ DeletePair(struct node* root,char word){
         DeletePair(root->right,word);
     }
     else{
+        // If NO child
+        if(root->left==NULL && root->right==NULL){
+            free(root);
+            printf("\nDone !\n");
+            return;
+        }
         
+        //If 1 child
+        else if(root->left==NULL){
+            struct node* temp = root->right;
+            free(root);
+            return;
+        }
+        else if(root->right==NULL){
+            struct node* temp = root->left;
+            free(root);
+            return;
+        }
     }
 }
